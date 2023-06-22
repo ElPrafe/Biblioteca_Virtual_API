@@ -1,92 +1,75 @@
 <?php
-require_once './app/controllers/author.controller.php';
-require_once './app/controllers/book.controller.php';
-require_once './app/controllers/login.controller.php';
 
-define('BASE_URL', '//'.$_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . dirname($_SERVER['PHP_SELF']).'/');
+class Route {
+    private $url;
+    private $verb;
+    private $controller;
+    private $method;
+    private $params;
 
-$action = 'author/all'; // acción por defecto
-if (!empty($_GET['action'])) {
-    $action = $_GET['action'];
+    public function __construct($url, $verb, $controller, $method){
+        $this->url = $url;
+        $this->verb = $verb;
+        $this->controller = $controller;
+        $this->method = $method;
+        $this->params = [];
+    }
+    public function match($url, $verb) {
+        if($this->verb != $verb){
+            return false;
+        }
+        $partsURL = explode("/", trim($url,'/'));
+        $partsRoute = explode("/", trim($this->url,'/'));
+        if(count($partsRoute) != count($partsURL)){
+            return false;
+        }
+        foreach ($partsRoute as $key => $part) {
+            if($part[0] != ":"){
+                if($part != $partsURL[$key])
+                return false;
+            } //es un parametro
+            else
+            $this->params[$part] = $partsURL[$key];
+        }
+        return true;
+    }
+    public function run(){
+        $controller = $this->controller;  
+        $method = $this->method;
+        $params = $this->params;
+       
+        (new $controller())->$method($params);
+    }
 }
 
+class Router {
+    private $routeTable = [];
+    private $defaultRoute;
 
-$params = explode('/', $action);
+    public function __construct() {
+        $this->defaultRoute = null;
+    }
 
-// instancio el unico controller que existe por ahora
-$authorController = new AuthorController();
-$bookController = new BookController();
-$loginController = new LoginController();
+    public function route($url, $verb) {
+        //$ruta->url //no compila!
+        foreach ($this->routeTable as $route) {
+            if($route->match($url, $verb)){
+                //TODO: ejecutar el controller//ejecutar el controller
+                // pasarle los parametros
+                $route->run();
+                return;
+            }
+        }
+        //Si ninguna ruta coincide con el pedido y se configuró ruta por defecto.
+        if ($this->defaultRoute != null)
+            $this->defaultRoute->run();
+    }
+    
+    public function addRoute ($url, $verb, $controller, $method) {
+        $this->routeTable[] = new Route($url, $verb, $controller, $method);
+    }
 
-
-// tabla de ruteo
-switch ($params[0]) {
-    case 'author':
-        switch ($params[1]) {
-            case 'all':
-                $authorController->showAuthors();  
-                break;
-            case 'id':
-                $authorController->showAuthor($params[2], false);   
-                break;
-            case 'add':
-                $authorController->addAuthorScreen(); 
-                break;
-            case 'addAttempt':
-                $authorController->addAuthor(); 
-                break;
-            case 'edit':
-                $authorController->editAuthorScreen($params[2]);  
-                break;
-            case 'editAttempt':
-                $authorController->editAuthorById($params[2]);  
-                break;
-            case 'delete':                
-                $authorController->deleteAuthor($params[2]); 
-                break;
-            default:
-                echo('404 Page not found');
-                break;
-        }              
-        break;  
-    case 'book':
-        switch ($params[1]) {
-            case 'all':
-                $bookController->showBooksWithAuthor(); 
-                break;
-            case 'id':
-                $bookController->showBook($params[2]); 
-                break;
-            case 'add':
-                $bookController->addBookScreen(); 
-                break;
-            case 'addAttempt':
-                $bookController->addBook(); 
-                break;
-            case 'delete':        
-                $bookController->deleteBook($params[2]); 
-                break;
-            case 'edit':                
-                $bookController->editBookScreen($params[2]); 
-                break;
-            case 'editAttempt':                
-                $bookController->editBookById($params[2]); 
-                break;
-            default:
-            echo('404 Page not found');
-                break;
-        }     
-        break; 
-    case 'login':
-        $loginController->login();
-        break;
-    case 'loginAttempt':        
-        $loginController->loginAttempt();
-        break;
-    case 'logout':        
-        $loginController->logout();
-        break;
-    default:
-        echo('404 Page not found');
-        break;
+    public function setDefaultRoute($controller, $method) {
+        $this->defaultRoute = new Route("", "", $controller, $method);
+    }
 }
