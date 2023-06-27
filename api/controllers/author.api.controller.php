@@ -1,12 +1,11 @@
 <?php
-require_once("./models/task.model.php");
-require_once("./api/json.view.php");
+require_once("../models/author.model.php");
+require_once("../views/json.view.php");
 
 class AuthorApiController {
 
     private $model;
     private $view;
-
     private $data;
 
     public function __construct() {
@@ -19,9 +18,9 @@ class AuthorApiController {
         return json_decode($this->data);
     }
 
-    public function  getTasks($params = null) {
-        $tareas = $this->model->getAll();
-        $this->view->response($tareas, 200);
+    public function  getAuthors($params = null) {
+        $authors = $this->model->getAuthors();
+        $this->view->response($authors, 200);
     }
 
     public function getTask($params = null) {

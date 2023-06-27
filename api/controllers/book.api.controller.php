@@ -2,7 +2,7 @@
 require_once("./models/task.model.php");
 require_once("./api/json.view.php");
 
-class TaskApiController {
+class BookApiController {
 
     private $model;
     private $view;
