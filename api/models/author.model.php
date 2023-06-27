@@ -42,13 +42,20 @@ class AuthorModel {
     }
 
     public function deleteAuthorById($id) {        
-        $query = $this->db->prepare('DELETE FROM autor WHERE id = ?');
-        
-        $query->execute([$id]);
+        $query = $this->db->prepare('DELETE FROM autor WHERE id = ?');       
+        try{
+            return $query->execute([$id]);
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
-    public function editAuthorById($id, $name, $img, $date, $nationality) {        
+    public function editAuthorById($id,$author) {      
         $query = $this->db->prepare("UPDATE autor SET nombre=?, nacionalidad=?, img_autor=?, fecha_nac=?  WHERE id=?");
-        $query->execute([$name, $nationality, $img, $date,$id]);
+        try{
+            return $query->execute([$author->name, $author->nationality, $author->img, $author->date, $id]);
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 }

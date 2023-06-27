@@ -8,11 +8,10 @@ class AuthorView {
         $this->smarty = new Smarty(); // inicializo Smarty
     }
 
-    function showAuthors($authors, $logged) {
+    function showAuthors($authors) {
         // asigno variables al tpl smarty                 
         $this->smarty->assign('count', count($authors)); 
         $this->smarty->assign('authors', $authors);
-        $this->smarty->assign('logged', $logged);
         // mostrar el tpl
         $this->smarty->display('author.list.tpl');
     }

@@ -33,21 +33,15 @@
             <li class="nav-item">
 
             </li>
-            {if $logged}
-              <li class="nav-item">
-                <a class="nav-link" href="author/add">Agregar Autor</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="book/add">Agregar Libro</a>
-              </li>
-            {/if}
+            <li class="nav-item">
+              <a class="nav-link" href="author/add">Agregar Autor</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="book/add">Agregar Libro</a>
+            </li>
           </ul>
           <div class="d-flex">
-            {if $logged}
-              <a class="nav-link navbar-brand" href="logout">Desconectarse</a>
-            {else}
-              <a class="nav-link navbar-brand" href="login">Ingresar</a>
-            {/if}
+            <a class="nav-link navbar-brand" href="login">Ingresar</a>
           </div>
         </div>
       </div>
