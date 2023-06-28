@@ -22,8 +22,15 @@ class AuthorApiController {
     }
 
     public function  getAuthors($params = null) {
-        $authors = $this->model->getAuthors();
-        $response=$this->jsonView->response($authors, 200);
+        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
+        $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
+        $authors = $this->model->getAuthors($sort, $order);
+        if ($authors){
+            $response=$this->jsonView->response($authors, 200);
+        }else{
+            $response=$this->jsonView->response('No se pudieron obtener los autores', 404);
+        }
+        
         //$this->view->showAuthors($authors);
     }
 
@@ -69,9 +76,11 @@ class AuthorApiController {
             $author->img = isset($data->img_autor) ? $data->img_autor : $author->img_autor;
             $author->nationality = isset($data->nacionalidad) ? $data->nacionalidad : $author->nacionalidad;
             $author->date = isset($data->fecha_nac) ? $data->fecha_nac : $author->fecha_nac;
-            $this->model->editAuthorById($id,$author);
-            $this->jsonView->response("El autor fue modificado con exito.", 200);
-
+            if ($this->model->editAuthorById($id,$author)) {
+                $this->jsonView->response("El autor fue modificado con exito.", 200);
+            }else{
+                $this->jsonView->response("No pudo modificarse el autor", 404);
+            }
         } else
             $this->jsonView->response("El autor con el id={$id} no existe", 404);
     }

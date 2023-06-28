@@ -11,11 +11,17 @@ class AuthorModel {
     /**
      * Devuelve los autores.
      */
-    public function getAuthors() {
-        $query = $this->db->prepare("SELECT * FROM autor");
-        $query->execute();
-        $authors = $query->fetchAll(PDO::FETCH_OBJ); 
-        return $authors;//VER COMO DEVOLVER SUS LIBROS
+    public function getAuthors($sort, $order) {
+        $orderBy = ' order by '. $sort . ' ' . $order;       
+        $query = $this->db->prepare("SELECT * FROM autor" . $orderBy);
+        try {
+            $query->execute();
+            $authors = $query->fetchAll(PDO::FETCH_OBJ); 
+            return $authors;
+        } catch (PDOException $e) {
+            return false;
+        }
+        
     }
 
     public function getAuthorById($id) {
@@ -37,6 +43,7 @@ class AuthorModel {
      */
     public function addAuthor($name, $img, $date, $nationality) {
         $query = $this->db->prepare("INSERT INTO autor (nombre, nacionalidad, img_autor, fecha_nac) VALUES (?, ?, ?, ?)");
+        
         $query->execute([$name, $nationality, $img, $date]);
         return $this->db->lastInsertId();
     }
@@ -51,9 +58,10 @@ class AuthorModel {
     }
 
     public function editAuthorById($id,$author) {      
-        $query = $this->db->prepare("UPDATE autor SET nombre=?, nacionalidad=?, img_autor=?, fecha_nac=?  WHERE id=?");
+        $query = $this->db->prepare("UPDATE autor SET id=?, nombre=?, nacionalidad=?, img_autor=?, fecha_nac=?  WHERE id=?");
         try{
-            return $query->execute([$author->name, $author->nationality, $author->img, $author->date, $id]);
+            $query->execute([$author->id,$author->name, $author->nationality, $author->img, $author->date, $id]);
+            return true;
         } catch (PDOException $e) {
             return false;
         }

@@ -26,9 +26,11 @@
 
 
 
-        // rutas author
-        //$router->addRoute("/tareas", "GET", "AuthorApiController", "getTasks");
-        //$router->addRoute("/tareas/:ID", "GET", "AuthorApiController", "getTask");
-        //$router->addRoute("/tareas/:ID", "DELETE", "AuthorApiController", "deleteTask");
-        //$router->addRoute("/tareas", "POST", "AuthorApiController", "addTask");
-        //$router->addRoute("/tareas/:ID", "PUT", "AuthorApiController", "updateTask");
+        
+
+
+
+    //DOCUMENTAR
+
+        //http://localhost/TPEWEB/Biblioteca_Virtual_API/libro?sort=titulo&order=asc
+        //http://localhost/TPEWEB/Biblioteca_Virtual_API/autor?sort=titulo&order=asc

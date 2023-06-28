@@ -11,62 +11,64 @@ class BookModel {
     /**
      * Devuelve los autores.
      */
-    public function getBooksByID($id) {
-        // 1. abro conexión a la DB
-        // ya esta abierta por el constructor de la clase
+    public function getBooksByIdAutor($id) {
 
-        // 2. ejecuto la sentencia (2 subpasos)
         $query = $this->db->prepare("SELECT * FROM libro where id_autor=?");
         $query->execute([$id]);
-        // 3. obtengo los resultados
-        $books = $query->fetchAll(PDO::FETCH_OBJ); // devuelve un arreglo de objetos
-        
-        return $books;//VER COMO DEVOLVER SUS LIBROS
-    }
-    public function getBooks() {
-        // 1. abro conexión a la DB
-        // ya esta abierta por el constructor de la clase
 
-        // 2. ejecuto la sentencia (2 subpasos)
-        $query = $this->db->prepare("SELECT * FROM libro");
-        $query->execute();
-        // 3. obtengo los resultados
-        $books = $query->fetchAll(PDO::FETCH_OBJ); // devuelve un arreglo de objetos
+        $books = $query->fetchAll(PDO::FETCH_OBJ); 
         
-        return $books;//VER COMO DEVOLVER SUS LIBROS
+        return $books;
+    }
+    public function getBooks($sort, $order) {
+        $orderBy = ' order by '. $sort . ' ' . $order;       
+        $query = $this->db->prepare("SELECT * FROM libro" . $orderBy);
+        try {
+            $query->execute();
+            $books = $query->fetchAll(PDO::FETCH_OBJ);
+            return $books;
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function getBookById($id) {
-        // 1. abro conexión a la DB
-        // ya esta abierta por el constructor de la clase
-        // 2. ejecuto la sentencia (2 subpasos)
+
         $query = $this->db->prepare("SELECT * FROM libro where id=?");
         $query->execute([$id]);
-        // 3. obtengo los resultados
-        $book = $query->fetch(PDO::FETCH_OBJ); // devuelve un arreglo de objetos        
+
+        $book = $query->fetch(PDO::FETCH_OBJ);      
         return $book;
     }
 
     public function getBookByTitle($title) {
-        // 1. abro conexión a la DB
-        // ya esta abierta por el constructor de la clase
-        // 2. ejecuto la sentencia (2 subpasos)
+
         $query = $this->db->prepare("SELECT * FROM libro where titulo=?");
         $query->execute([$title]);
-        // 3. obtengo los resultados
-        $book = $query->fetch(PDO::FETCH_OBJ); // devuelve un arreglo de objetos        
+
+        $book = $query->fetch(PDO::FETCH_OBJ);      
         return $book;
     }
 
     public function addBook($title, $desc, $genre, $img, $author_id) {
-        $query = $this->db->prepare("INSERT INTO libro (titulo, descripcion, genero,img_tapa, id_autor) VALUES (?, ?, ?, ?, ?)");
-        $query->execute([$title, $desc, $genre, $img, $author_id]);
+        $query = $this->db->prepare("INSERT INTO libro (titulo, descripcion, genero,img_tapa, id_autor) VALUES (?, ?, ?, ?, ?)");        
+        try{
+            $query->execute([$title, $desc, $genre, $img, $author_id]);
+            return $this->db->lastInsertId();
+        } catch (PDOException $e) {
+            return false;
+        }
 
-        return $this->db->lastInsertId();
+        
     }
-    public function editBookById($id, $title, $genre, $desc, $img, $authorid) {        
-        $query = $this->db->prepare("UPDATE libro SET titulo=?, descripcion=?, genero=?, img_tapa=?, id_autor=?  WHERE id=?");
-        $query->execute([$title, $desc, $genre, $img, $authorid, $id]);        
+    public function editBookById($book, $id) {        
+        $query = $this->db->prepare("UPDATE libro SET id=?, titulo=?, descripcion=?, genero=?, img_tapa=?, id_autor=?  WHERE id=?");
+        try{
+            $query->execute([$book->id, $book->titulo, $book->descripcion, $book->genero, $book->img_tapa, $book->id_autor, $id]);   
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }     
     }
 
     public function deleteBookById($id) {
