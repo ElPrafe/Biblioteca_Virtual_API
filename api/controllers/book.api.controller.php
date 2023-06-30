@@ -1,16 +1,19 @@
 <?php
 require_once("./api/models/book.model.php");
 require_once("./api/views/json.view.php");
+require_once("./helpers/auth.helper.php");
 
 class BookApiController {
 
     private $model;
     private $jsonView;
     private $data;
+    private $auth;
 
     public function __construct() {
         $this->model = new BookModel();
         $this->jsonView = new JSONView();
+        $this->auth = new AuthHelper();
         $this->data = file_get_contents("php://input");
     }
 
@@ -40,6 +43,10 @@ class BookApiController {
     } 
 
     public function deleteBook($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $id = $params[':ID'];
         $books = $this->model->getBookById($id);
         if ($books) {
@@ -50,6 +57,10 @@ class BookApiController {
     }
 
     public function addBook($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $data = $this->getData();
         $id = $this->model->addBook($data->titulo, isset($data->descripcion) ? $data->descripcion : null, $data->genero, isset($data->img_tapa) ? $data->img_tapa : null, $data->id_autor);
         $book = $this->model->getBookById($id);
@@ -60,6 +71,10 @@ class BookApiController {
     }
 
     public function updateBook($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $id = $params[':ID'];
         $data = $this->getData();        
         $book = $this->model->getBookById($id);

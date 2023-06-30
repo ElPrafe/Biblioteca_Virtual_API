@@ -2,6 +2,7 @@
     require_once('./router.php');
     require_once('./api/controllers/author.api.controller.php');
     require_once('./api/controllers/book.api.controller.php');
+    require_once('./api/controllers/login.controller.php');
     
     // CONSTANTES PARA RUTEO
     define("BASE_URL", 'http://'.$_SERVER["SERVER_NAME"].':'.$_SERVER["SERVER_PORT"].dirname($_SERVER["PHP_SELF"]).'/');
@@ -20,6 +21,11 @@
     $router->addRoute("/libro/:ID", "DELETE", "BookApiController", "deleteBook");
     $router->addRoute("/libro", "POST", "BookApiController", "addBook");
     $router->addRoute("/libro/:ID", "PUT", "BookApiController", "updateBook");
+
+
+
+
+    $router->addRoute("/login", "GET", "LoginController", "login");
 
     //run
     $router->route($_GET['resource'], $_SERVER['REQUEST_METHOD']); 

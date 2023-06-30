@@ -2,6 +2,7 @@
 require_once("./api/models/author.model.php");
 //require_once("./api/views/author.view.php");
 require_once("./api/views/json.view.php");
+require_once("./helpers/auth.helper.php");
 
 class AuthorApiController {
 
@@ -9,9 +10,11 @@ class AuthorApiController {
     private $jsonView;
     private $view;
     private $data;
+    private $auth;
 
     public function __construct() {
         $this->model = new AuthorModel();
+        $this->auth = new AuthHelper();
         //$this->view = new AuthorView();
         $this->jsonView = new JSONView();
         $this->data = file_get_contents("php://input");
@@ -21,7 +24,8 @@ class AuthorApiController {
         return json_decode($this->data);
     }
 
-    public function  getAuthors($params = null) {
+    public function  getAuthors($params = null) {      
+        
         $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
         $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
         $authors = $this->model->getAuthors($sort, $order);
@@ -35,6 +39,7 @@ class AuthorApiController {
     }
 
     public function getAuthor($params = null) {
+        
         $id = $params[':ID'];    
         $author = $this->model->getAuthorById($id);        
         if ($author)
@@ -44,6 +49,10 @@ class AuthorApiController {
     } 
 
     public function deleteAuthor($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $id = $params[':ID'];
         $author = $this->model->getAuthorById($id);
         if ($author) {
@@ -56,6 +65,10 @@ class AuthorApiController {
     }
 
     public function addAuthor($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $data = $this->getData();
         $id = $this->model->addAuthor($data->nombre, isset($data->img_autor) ? $data->img_autor : null, $data->fecha_nac,$data->nacionalidad);        
         $author = $this->model->getAuthorById($id);
@@ -67,6 +80,10 @@ class AuthorApiController {
     }
 
     public function updateAuthor($params = null) {
+        if (!$this->auth->validarToken()){
+            $response=$this->jsonView->response('Necesita loggearse', 401);
+            die();
+        }
         $id = $params[':ID'];
         $data = $this->getData();
         $author = $this->model->getAuthorById($id);

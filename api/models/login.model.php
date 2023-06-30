@@ -8,7 +8,7 @@ class LoginModel {
         $this->db = new PDO('mysql:host=localhost;'.'dbname=db_library;charset=utf8', 'root', '');
     }
     
-    public function getByUsername($username){
+    public function getUsuario($username){
 
         $query = $this->db->prepare('SELECT * FROM usuarios WHERE usuario = ?');
         $query->execute([$username]);
