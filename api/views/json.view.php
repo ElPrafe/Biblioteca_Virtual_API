@@ -15,6 +15,7 @@ class JSONView {
         $status = array(
           409 => "Contraint Restrict",
           200 => "OK",
+          201 => "OK",
           404 => "Not found",
           500 => "Internal Server Error"
         );

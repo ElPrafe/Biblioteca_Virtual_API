@@ -24,15 +24,27 @@ class AuthorApiController {
         return json_decode($this->data);
     }
 
+    public function queryParamsCheck($sort,$order){
+        if ($sort != 'id' && $sort !='nombre' && $sort != 'img_autor' && $sort !='nacionalidad' && $sort !='fecha_nac'){
+            $this->jsonView->response('El parametro asignado a "sort" es invalido',400);
+            die();
+        }
+        if($order !='asc'&&$order!='desc'){
+            $this->jsonView->response('El parametro asignado a "order" es invalido',400);
+            die();
+        }
+    }
+
     public function  getAuthors($params = null) {      
         
         $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
         $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
+        $this->queryParamsCheck($sort,$order);
         $authors = $this->model->getAuthors($sort, $order);
         if ($authors){
             $response=$this->jsonView->response($authors, 200);
         }else{
-            $response=$this->jsonView->response('No se pudieron obtener los autores', 404);
+            $response=$this->jsonView->response('No se pudieron obtener los autores', 500);
         }
         
         //$this->view->showAuthors($authors);
@@ -64,12 +76,50 @@ class AuthorApiController {
             $this->jsonView->response("El autor con el id={$id} no existe", 404);
     }
 
+    public function checkJsonAuthor($author){
+        if(!isset($author->nombre) || !isset($author->nacionalidad) || !isset ($author->fecha_nac)){
+            $this->jsonView->response('El objeto debe poseer nombre, nacionalidad y fecha_nac', 400 );
+            die();
+        }
+        if (strlen($author->nombre)>50){
+            $this->jsonView->response('El nombre no puede tener mas de 50 caracteres', 400 );
+            die();
+        }
+        if (strlen($author->nacionalidad)>50){
+            $this->jsonView->response('La nacionalidad no puede tener mas de 50 caracteres', 400 );
+            die();
+        }
+        $fecha = explode('-',$author->fecha_nac);
+        if(count($fecha)!=3){
+            $this->jsonView->response('fecha_nac es invalido', 400 );
+            die();
+        }else{
+            $year = $fecha[0];
+            if ($year>2019){
+                $this->jsonView->response('El año en fecha_nac tiene que ser menor a 2020', 400 );
+                die();
+            }
+            $month = $fecha[1];
+            if ($month>12 || $month<1){
+                $this->jsonView->response('El mes en fecha_nac tiene que estar entre 1 y 12', 400 );
+                die();
+            }
+            $day = $fecha[2];
+            if ($day>31 || $day<1){
+                $this->jsonView->response('El dia en fecha_nac tiene que estar entre 1 y 31', 400 );
+                die();
+            }
+        }
+        
+    }
+
     public function addAuthor($params = null) {
         if (!$this->auth->validarToken()){
             $response=$this->jsonView->response('Necesita loggearse', 401);
             die();
         }
         $data = $this->getData();
+        $this->checkJsonAuthor($data);
         $id = $this->model->addAuthor($data->nombre, isset($data->img_autor) ? $data->img_autor : null, $data->fecha_nac,$data->nacionalidad);        
         $author = $this->model->getAuthorById($id);
 
@@ -88,13 +138,14 @@ class AuthorApiController {
         $data = $this->getData();
         $author = $this->model->getAuthorById($id);
         if ($author) {
+
             $author->id = isset($data->id) ? $data->id : $author->id;
             $author->name = isset($data->nombre) ? $data->nombre : $author->nombre;
             $author->img = isset($data->img_autor) ? $data->img_autor : $author->img_autor;
             $author->nationality = isset($data->nacionalidad) ? $data->nacionalidad : $author->nacionalidad;
             $author->date = isset($data->fecha_nac) ? $data->fecha_nac : $author->fecha_nac;
             if ($this->model->editAuthorById($id,$author)) {
-                $this->jsonView->response("El autor fue modificado con exito.", 200);
+                $this->jsonView->response("El autor fue modificado con exito.", 201);
             }else{
                 $this->jsonView->response("No pudo modificarse el autor", 404);
             }
