@@ -14,6 +14,7 @@ class AuthorModel {
     public function getAuthors($sort, $order, $inicio = null, $cantidad = null) {
         $orderBy = ' order by '. $sort . ' ' . $order;       
         $sql = "SELECT * FROM autor" . $orderBy;        
+        //si pidieron una paginacion, lo agrega a la consulta, sino pide todos los autores
         $sql = $inicio != null && $cantidad !=null ? $sql . " LIMIT " . ($inicio) . ", " . ($cantidad) : $sql;        
         $query = $this->db->prepare($sql);        
         try {
@@ -40,9 +41,6 @@ class AuthorModel {
         return $author;
     }
 
-    /**
-     * Inserta un autor en la base de datos.
-     */
     public function addAuthor($name, $img, $date, $nationality) {
         $query = $this->db->prepare("INSERT INTO autor (nombre, nacionalidad, img_autor, fecha_nac) VALUES (?, ?, ?, ?)");
         try {

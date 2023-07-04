@@ -3,41 +3,23 @@ require_once './api/models/login.model.php';
 class AuthHelper
 {
     // Define la clave secreta utilizada para firmar el token
-    private $secretKey = 'segundo_francia';
-    private $usuario;
+    private $secretKey = 'clavesupersecreta';
     private $loginModel;
 
     public function __construct()
     {
         $this->loginModel = new LoginModel();
-        $this->usuario = null;
     }
 
-    public function validarPermisos()
-    {
-        $header = apache_request_headers();
-        if (!isset($header['Authorization']))
-            return null;
-        $authorization = $header['Authorization'];
-        $params = explode(' ', $authorization);
-        $token = $params[1];
-        $idUsuario = $this->comprobarToken($token);
-        if ($idUsuario) {
-            //Buscamos el usuario en la DB y lo guardamos en la clase
-            $this->usuario = $this->loginModel->getUsuario(null, $idUsuario);
-            return true;
-        } else
-            return null;
-    }
 
     public function validarToken(){
-        $header = apache_request_headers();
-        if (!isset($header['Authorization']))
+        $header = apache_request_headers();//Obtiene el Header enviado por el usuario
+        if (!isset($header['Authorization']))//Se fija si el token esta vacio
             return null;
         $authorization = $header['Authorization'];
         $params = explode(' ', $authorization);
-        $token = $params[1];
-        $idUsuario = $this->comprobarToken($token);
+        $token = $params[1];//obtiene el token
+        $idUsuario = $this->comprobarToken($token);//comprueba que el token sea valido
         if ($idUsuario) {        
             return true;
         } else

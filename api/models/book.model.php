@@ -8,21 +8,17 @@ class BookModel {
         $this->db = new PDO('mysql:host=localhost;'.'dbname=db_library;charset=utf8', 'root', '');
     }
 
-    /**
-     * Devuelve los autores.
-     */
     public function getBooksByIdAutor($id) {
 
         $query = $this->db->prepare("SELECT * FROM libro where id_autor=?");
         $query->execute([$id]);
-
-        $books = $query->fetchAll(PDO::FETCH_OBJ); 
-        
+        $books = $query->fetchAll(PDO::FETCH_OBJ);         
         return $books;
     }
     public function getBooks($sort = 'id', $order = 'asc', $inicio = null, $cantidad = null) {
         $orderBy = ' order by '. $sort . ' ' . $order;       
         $sql = "SELECT * FROM libro" . $orderBy;        
+        //si pidieron una paginacion, lo agrega a la consulta, sino pide todos los libros
         $sql = $inicio != null && $cantidad !=null ? $sql . " LIMIT " . ($inicio) . ", " . ($cantidad) : $sql;        
         $query = $this->db->prepare($sql);        
         try {
@@ -38,7 +34,6 @@ class BookModel {
 
         $query = $this->db->prepare("SELECT * FROM libro where id=?");
         $query->execute([$id]);
-
         $book = $query->fetch(PDO::FETCH_OBJ);      
         return $book;
     }
@@ -47,7 +42,6 @@ class BookModel {
 
         $query = $this->db->prepare("SELECT * FROM libro where titulo=?");
         $query->execute([$title]);
-
         $book = $query->fetch(PDO::FETCH_OBJ);      
         return $book;
     }

@@ -22,14 +22,13 @@ class AuthorApiController {
     }
 
 
-    public function  getAuthors($params = null) {      
+    public function  getAuthors($params = null) {
         $data = $this->getData(); 
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
-        $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
-
+        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';//si no enviaron un sort, lo setea en "id"
+        $order = isset($_GET['order']) ? $_GET['order'] : 'asc';//si no enviaron un order, lo setea en "asc"
         $inicio = null;
         $cantidad = null;
-        
+        //verifica si solicitaron los autores de forma paginada
         if (isset($data->pagina) && is_numeric($data->pagina) && isset($data->elempagina) && is_numeric($data->elempagina)){
             $inicio = strval((($data->pagina-1) * $data->elempagina));
             $cantidad = $data->elempagina;
@@ -86,9 +85,8 @@ class AuthorApiController {
         $img_autor = isset($data->img_autor) ? $data->img_autor : null;        
         $fecha_nac = isset($data->fecha_nac) && strtotime($data->fecha_nac) ? $data->fecha_nac : null;        
         $nacionalidad = isset($data->nacionalidad) ? $data->nacionalidad : null;        
-        $id = $this->model->addAuthor($nombre, $img_autor, $fecha_nac,$nacionalidad);        
-                
-
+        $id = $this->model->addAuthor($nombre, $img_autor, $fecha_nac,$nacionalidad);   
+        //verifica que $id sea un id. De no ser asi, no pide el autor.
         $author =is_numeric($id)? $this->model->getAuthorById($id) : null;
 
         if ($author)
@@ -106,7 +104,7 @@ class AuthorApiController {
         $data = $this->getData();
         $author = $this->model->getAuthorById($id);
         if ($author) {
-
+            //Verifica que todos los datos esten cargados, sino se les asigna el valor que ya tenia.
             $author->id = isset($data->id) ? $data->id : $author->id;
             $author->name = isset($data->nombre) ? $data->nombre : $author->nombre;
             $author->img = isset($data->img_autor) ? $data->img_autor : $author->img_autor;

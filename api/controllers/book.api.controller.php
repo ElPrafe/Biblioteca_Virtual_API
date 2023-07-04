@@ -26,11 +26,11 @@ class BookApiController {
 
     public function  getBooks($params = null) { 
         $data = $this->getData();       
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
-        $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
+        $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';//si no enviaron un sort, lo setea en "id"
+        $order = isset($_GET['order']) ? $_GET['order'] : 'asc';//si no enviaron un order, lo setea en "asc"
         $inicio = null;
         $cantidad = null;
-        
+        //verifica si solicitaron los autores de forma paginada
         if (isset($data->pagina) && is_numeric($data->pagina) && isset($data->elempagina) && is_numeric($data->elempagina)){
             $inicio = strval((($data->pagina-1) * $data->elempagina));
             $cantidad = $data->elempagina;
@@ -83,6 +83,7 @@ class BookApiController {
         $img_tapa = isset($data->img_tapa) ? $data->img_tapa : null;
         $id_autor = isset($data->id_autor) ? $data->id_autor : null;
         $id = $this->model->addBook($titulo, $descripcion, $genero, $img_tapa, $id_autor);
+        //verifica que $id sea un id. De no ser asi, no pide el libro.
         $book = is_numeric($id) ? $this->model->getBookById($id) : null;
         if ($book)
             $this->jsonView->response($book, 201);
@@ -99,7 +100,7 @@ class BookApiController {
         $data = $this->getData();        
         $book = $this->model->getBookById($id);
         if ($book) {
-            //Verifico que todos los datos esten cargados, sino se les asigna el valor que ya tenia.
+            //Verifica que todos los datos esten cargados, sino se les asigna el valor que ya tenia.
             $book->id = isset($data->id) ? $data->id : $book->id;
             $book->titulo = isset($data->titulo) ? $data->titulo : $book->titulo;
             $book->genero = isset($data->genero) ? $data->genero : $book->genero;
