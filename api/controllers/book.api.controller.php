@@ -70,31 +70,19 @@ class BookApiController {
             $this->jsonView->response("El libro con el id={$id} no existe", 404);
     }
 
-    public function checkJsonBook($book){
-        if(!isset($book->titulo) || !isset($book->genero) || !isset ($book->id_autor)){
-            $this->jsonView->response('El objeto debe poseer titulo, genero e id_autor', 400);
-            die();
-        }
-        if (strlen($book->titulo)>50){
-            $this->jsonView->response('El titulo no puede tener mas de 50 caracteres', 400);
-            die();
-        }
-        $author = $this->modelAuthor->getAuthorById($book->id_autor);
-        if (!$author){
-            $this->jsonView->response('El id_autor no existe en la base de datos', 404);
-            die();
-        }
-
-    }
-
     public function addBook($params = null) {
         if (!$this->auth->validarToken()){
             $response=$this->jsonView->response('Necesita loggearse', 401);
             die();
         }
         $data = $this->getData();
-        $this->checkJsonBook($data);
-        $id = $this->model->addBook($data->titulo, isset($data->descripcion) ? $data->descripcion : null, $data->genero, isset($data->img_tapa) ? $data->img_tapa : null, $data->id_autor);
+        
+        $titulo = isset($data->titulo) ? $data->titulo : null;
+        $descripcion = isset($data->descripcion) ? $data->descripcion : null;
+        $genero = isset($data->genero) ? $data->genero : null;
+        $img_tapa = isset($data->img_tapa) ? $data->img_tapa : null;
+        $id_autor = isset($data->id_autor) ? $data->id_autor : null;
+        $id = $this->model->addBook($titulo, $descripcion, $genero, $img_tapa, $id_autor);
         $book = $this->model->getBookById($id);
         if ($book)
             $this->jsonView->response($book, 201);

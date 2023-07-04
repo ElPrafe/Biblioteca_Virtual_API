@@ -43,9 +43,17 @@ class AuthorModel {
      */
     public function addAuthor($name, $img, $date, $nationality) {
         $query = $this->db->prepare("INSERT INTO autor (nombre, nacionalidad, img_autor, fecha_nac) VALUES (?, ?, ?, ?)");
+        try {
+            $query->execute([$name, $nationality, $img, $date]);
+            return $this->db->lastInsertId();
+        } catch (PDOException $e) {            
+            return $e->getMessage();
+            // $errorMsg = $e->getMessage();
+            // $pattern = "/('.*')/";
+            // preg_match($pattern, $errorMsg, $matches);            
+            // return 'La columna ' . $matches[1] .' tuvo un error. Error SQL numero '. $e->getCode();
+        }
         
-        $query->execute([$name, $nationality, $img, $date]);
-        return $this->db->lastInsertId();
     }
 
     public function deleteAuthorById($id) {        

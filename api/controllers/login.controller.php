@@ -29,8 +29,8 @@ class LoginController
     public function login($params = null)
     {        
         $datos = $this->getData();        
-        $usuario = $datos->usuario;
-        $pass = $datos->password;
+        $usuario = isset($datos->usuario) ? $datos->usuario : null;
+        $pass = isset($datos->password) ? $datos->password : null;
         if (empty($usuario) || empty($pass)) {
             $this->view->response("Debe indicar el nombre de usuario y la contraseña.", 400);
             return;

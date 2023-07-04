@@ -76,57 +76,28 @@ class AuthorApiController {
             $this->jsonView->response("El autor con el id={$id} no existe", 404);
     }
 
-    public function checkJsonAuthor($author){
-        if(!isset($author->nombre) || !isset($author->nacionalidad) || !isset ($author->fecha_nac)){
-            $this->jsonView->response('El objeto debe poseer nombre, nacionalidad y fecha_nac', 400 );
-            die();
-        }
-        if (strlen($author->nombre)>50){
-            $this->jsonView->response('El nombre no puede tener mas de 50 caracteres', 400 );
-            die();
-        }
-        if (strlen($author->nacionalidad)>50){
-            $this->jsonView->response('La nacionalidad no puede tener mas de 50 caracteres', 400 );
-            die();
-        }
-        $fecha = explode('-',$author->fecha_nac);
-        if(count($fecha)!=3){
-            $this->jsonView->response('fecha_nac es invalido', 400 );
-            die();
-        }else{
-            $year = $fecha[0];
-            if ($year>2019){
-                $this->jsonView->response('El año en fecha_nac tiene que ser menor a 2020', 400 );
-                die();
-            }
-            $month = $fecha[1];
-            if ($month>12 || $month<1){
-                $this->jsonView->response('El mes en fecha_nac tiene que estar entre 1 y 12', 400 );
-                die();
-            }
-            $day = $fecha[2];
-            if ($day>31 || $day<1){
-                $this->jsonView->response('El dia en fecha_nac tiene que estar entre 1 y 31', 400 );
-                die();
-            }
-        }
-        
-    }
+    
 
     public function addAuthor($params = null) {
         if (!$this->auth->validarToken()){
-            $response=$this->jsonView->response('Necesita loggearse', 401);
+            $this->jsonView->response('Necesita loggearse', 401);
             die();
         }
         $data = $this->getData();
-        $this->checkJsonAuthor($data);
-        $id = $this->model->addAuthor($data->nombre, isset($data->img_autor) ? $data->img_autor : null, $data->fecha_nac,$data->nacionalidad);        
-        $author = $this->model->getAuthorById($id);
+        //Verifico que todos los datos esten cargados, sino se les asigna NULL. Tambien se verifica que fecha_nac sea de tipo date.
+        $nombre = isset($data->nombre) ? $data->nombre : null;        
+        $img_autor = isset($data->img_autor) ? $data->img_autor : null;        
+        $fecha_nac = isset($data->fecha_nac) && strtotime($data->fecha_nac) ? $data->fecha_nac : null;        
+        $nacionalidad = isset($data->nacionalidad) ? $data->nacionalidad : null;        
+        $id = $this->model->addAuthor($nombre, $img_autor, $fecha_nac,$nacionalidad);        
+                
+
+        $author =is_numeric($id)? $this->model->getAuthorById($id) : null;
 
         if ($author)
             $this->jsonView->response($author, 201);
         else
-            $this->jsonView->response("El autor no fue creado", 500);
+            $this->jsonView->response("El autor no fue creado :". $id, 500);
     }
 
     public function updateAuthor($params = null) {
