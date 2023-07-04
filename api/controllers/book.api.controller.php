@@ -97,7 +97,7 @@ class BookApiController {
         $id = $this->model->addBook($data->titulo, isset($data->descripcion) ? $data->descripcion : null, $data->genero, isset($data->img_tapa) ? $data->img_tapa : null, $data->id_autor);
         $book = $this->model->getBookById($id);
         if ($book)
-            $this->jsonView->response($book, 200);
+            $this->jsonView->response($book, 201);
         else
             $this->jsonView->response("El libro no fue creado", 500);
     }

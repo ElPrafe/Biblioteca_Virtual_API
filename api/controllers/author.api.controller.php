@@ -124,7 +124,7 @@ class AuthorApiController {
         $author = $this->model->getAuthorById($id);
 
         if ($author)
-            $this->jsonView->response($author, 200);
+            $this->jsonView->response($author, 201);
         else
             $this->jsonView->response("El autor no fue creado", 500);
     }
