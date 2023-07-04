@@ -23,27 +23,27 @@ class BookApiController {
     private function getData() {
         return json_decode($this->data);
     }
-    
-    public function queryParamsCheck($sort,$order){
-        if ($sort != 'id' && $sort !='genero' && $sort != 'titulo' && $sort !='id_autor' && $sort !='descripcion' && $sort !='img_tapa'){
-            $this->jsonView->response('El parametro asignado a "sort" es invalido',400);
-            die();
-        }
-        if($order !='asc'&&$order!='desc'){
-            $this->jsonView->response('El parametro asignado a "order" es invalido',400);
-            die();
-        }
-    }
 
-    public function  getBooks($params = null) {        
+    public function  getBooks($params = null) { 
+        $data = $this->getData();       
         $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
         $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
-        $this->queryParamsCheck($sort, $order);
-        $books = $this->model->getBooks($sort, $order);     
-        if ($books){
-            $this->jsonView->response($books, 200);
+        $inicio = null;
+        $cantidad = null;
+        
+        if (isset($data->pagina) && is_numeric($data->pagina) && isset($data->elempagina) && is_numeric($data->elempagina)){
+            $inicio = strval((($data->pagina-1) * $data->elempagina));
+            $cantidad = $data->elempagina;
+        }
+        $books = $this->model->getBooks($sort, $order, $inicio, $cantidad);  
+        
+        if (is_array($books)){
+            if(count($books)>0)
+                $this->jsonView->response($books, 200);
+            else
+                $this->jsonView->response('No existen elementos para la paginacion solicitada', 400);
         }else{
-            $this->jsonView->response('No se pudieron obtener los libros',500);
+            $this->jsonView->response('No se pudieron obtener los libros. Error: ' . $books,500);
         }
     }
 
@@ -76,18 +76,18 @@ class BookApiController {
             die();
         }
         $data = $this->getData();
-        
+        //Verifico que todos los datos esten cargados, sino se les asigna NULL.
         $titulo = isset($data->titulo) ? $data->titulo : null;
         $descripcion = isset($data->descripcion) ? $data->descripcion : null;
         $genero = isset($data->genero) ? $data->genero : null;
         $img_tapa = isset($data->img_tapa) ? $data->img_tapa : null;
         $id_autor = isset($data->id_autor) ? $data->id_autor : null;
         $id = $this->model->addBook($titulo, $descripcion, $genero, $img_tapa, $id_autor);
-        $book = $this->model->getBookById($id);
+        $book = is_numeric($id) ? $this->model->getBookById($id) : null;
         if ($book)
             $this->jsonView->response($book, 201);
         else
-            $this->jsonView->response("El libro no fue creado", 500);
+            $this->jsonView->response("El libro no fue creado. Error: " . $id, 500);
     }
 
     public function updateBook($params = null) {
@@ -99,6 +99,7 @@ class BookApiController {
         $data = $this->getData();        
         $book = $this->model->getBookById($id);
         if ($book) {
+            //Verifico que todos los datos esten cargados, sino se les asigna el valor que ya tenia.
             $book->id = isset($data->id) ? $data->id : $book->id;
             $book->titulo = isset($data->titulo) ? $data->titulo : $book->titulo;
             $book->genero = isset($data->genero) ? $data->genero : $book->genero;

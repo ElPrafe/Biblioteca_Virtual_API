@@ -11,15 +11,17 @@ class AuthorModel {
     /**
      * Devuelve los autores.
      */
-    public function getAuthors($sort, $order) {
+    public function getAuthors($sort, $order, $inicio = null, $cantidad = null) {
         $orderBy = ' order by '. $sort . ' ' . $order;       
-        $query = $this->db->prepare("SELECT * FROM autor" . $orderBy);
+        $sql = "SELECT * FROM autor" . $orderBy;        
+        $sql = $inicio != null && $cantidad !=null ? $sql . " LIMIT " . ($inicio) . ", " . ($cantidad) : $sql;        
+        $query = $this->db->prepare($sql);        
         try {
             $query->execute();
-            $authors = $query->fetchAll(PDO::FETCH_OBJ); 
-            return $authors;
+            $books = $query->fetchAll(PDO::FETCH_OBJ);
+            return $books;
         } catch (PDOException $e) {
-            return false;
+            return $e->getMessage();
         }
         
     }

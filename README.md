@@ -24,6 +24,22 @@ Respuesta:
 Código de estado: 200(Obtenidos).
 Cuerpo de respuesta: Devuelve todos los autores.
 
+# Pedir la lista de autores paginado
+Método: GET
+Ruta: /autor
+Cuerpo de la solicitud: pagina y elempagina
+
+Ejemplo del cuerpo de la solicitud para obtener
+{
+    "pagina" : 2,
+    "elempagina" : 5
+}   
+
+Respuesta:
+Código de estado: 200(Obtenidos).
+Código de estado: 400(No hay elementos en esa pagina).
+Cuerpo de respuesta: Devuelve un arreglo de 5 autores desde la posicion 5 a la posicion 9.
+
 # Pedir la lista de autores con filtro "sort"(puede usarse con el order)
 Método: GET
 Ruta: /autor?sort=valor
@@ -111,6 +127,22 @@ Ruta: /libro
 Respuesta:
 Código de estado: 200(Obtenidos).
 Cuerpo de respuesta: Devuelve todos los libros.
+
+# Pedir la lista de libros paginado
+Método: GET
+Ruta: /libro
+Cuerpo de la solicitud: pagina y elempagina
+
+Ejemplo del cuerpo de la solicitud para obtener
+{
+    "pagina" : 1,
+    "elempagina" : 5
+}   
+
+Respuesta:
+Código de estado: 200(Obtenidos).
+Código de estado: 400(No hay elementos en esa pagina).
+Cuerpo de respuesta: Devuelve un arreglo de 5 libros desde la posicion 0 a la posicion 4.
 
 # Pedir la lista de libros con filtro "sort"(puede usarse con el order)
 Método: GET

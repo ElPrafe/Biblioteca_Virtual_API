@@ -1,6 +1,5 @@
 <?php
 require_once("./api/models/author.model.php");
-//require_once("./api/views/author.view.php");
 require_once("./api/views/json.view.php");
 require_once("./helpers/auth.helper.php");
 
@@ -8,14 +7,12 @@ class AuthorApiController {
 
     private $model;
     private $jsonView;
-    private $view;
     private $data;
     private $auth;
 
     public function __construct() {
         $this->model = new AuthorModel();
         $this->auth = new AuthHelper();
-        //$this->view = new AuthorView();
         $this->jsonView = new JSONView();
         $this->data = file_get_contents("php://input");
     }
@@ -24,30 +21,30 @@ class AuthorApiController {
         return json_decode($this->data);
     }
 
-    public function queryParamsCheck($sort,$order){
-        if ($sort != 'id' && $sort !='nombre' && $sort != 'img_autor' && $sort !='nacionalidad' && $sort !='fecha_nac'){
-            $this->jsonView->response('El parametro asignado a "sort" es invalido',400);
-            die();
-        }
-        if($order !='asc'&&$order!='desc'){
-            $this->jsonView->response('El parametro asignado a "order" es invalido',400);
-            die();
-        }
-    }
 
     public function  getAuthors($params = null) {      
-        
+        $data = $this->getData(); 
         $sort = isset($_GET['sort']) ? $_GET['sort'] : 'id';
         $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
-        $this->queryParamsCheck($sort,$order);
-        $authors = $this->model->getAuthors($sort, $order);
-        if ($authors){
-            $response=$this->jsonView->response($authors, 200);
+
+        $inicio = null;
+        $cantidad = null;
+        
+        if (isset($data->pagina) && is_numeric($data->pagina) && isset($data->elempagina) && is_numeric($data->elempagina)){
+            $inicio = strval((($data->pagina-1) * $data->elempagina));
+            $cantidad = $data->elempagina;
+        }
+        $authors = $this->model->getAuthors($sort, $order, $inicio, $cantidad);
+
+        if (is_array($authors)){
+            if(count($authors)>0)
+                $response=$this->jsonView->response($authors, 200);
+            else
+                $response=$this->jsonView->response('No existen elementos para la paginacion solicitada', 400);
         }else{
-            $response=$this->jsonView->response('No se pudieron obtener los autores', 500);
+            $response=$this->jsonView->response('No se pudieron obtener los autores. Error: ' . $authors, 500);
         }
         
-        //$this->view->showAuthors($authors);
     }
 
     public function getAuthor($params = null) {
