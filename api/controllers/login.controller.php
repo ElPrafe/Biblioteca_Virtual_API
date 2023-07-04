@@ -31,15 +31,11 @@ class LoginController
         $datos = $this->getData();        
         $usuario = $datos->usuario;
         $pass = $datos->password;
-        $this->view->response($usuario, 400);
         if (empty($usuario) || empty($pass)) {
             $this->view->response("Debe indicar el nombre de usuario y la contraseña.", 400);
             return;
         }
-
-        //$usuario = $this->loginModel->comprobarUsuario($usuario, $pass);
         $usuario = $this->loginModel->getUsuario($usuario);
-
         if ($this->checkUser($usuario, $pass)) {
             $aut = new AuthHelper();            
             $token = $aut->getToken($usuario);

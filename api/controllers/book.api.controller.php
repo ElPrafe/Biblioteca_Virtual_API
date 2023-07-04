@@ -81,7 +81,7 @@ class BookApiController {
         }
         $author = $this->modelAuthor->getAuthorById($book->id_autor);
         if (!$author){
-            $this->jsonView->response('El id_autor no existe en la base de datos', 400);
+            $this->jsonView->response('El id_autor no existe en la base de datos', 404);
             die();
         }
 
@@ -119,7 +119,7 @@ class BookApiController {
             $book->id_autor = isset($data->id_autor) ? $data->id_autor : $book->id_autor;
             $author = $this->modelAuthor->getAuthorById($book->id_autor);
             if (!$author){
-                $this->jsonView->response('El id_autor no existe en la base de datos', 400);
+                $this->jsonView->response('El id_autor no existe en la base de datos', 404);
                 die();
             }
             if ($this->model->editBookById($book, $id)){

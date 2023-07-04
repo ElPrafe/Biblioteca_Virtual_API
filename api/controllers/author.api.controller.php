@@ -145,7 +145,7 @@ class AuthorApiController {
             $author->nationality = isset($data->nacionalidad) ? $data->nacionalidad : $author->nacionalidad;
             $author->date = isset($data->fecha_nac) ? $data->fecha_nac : $author->fecha_nac;
             if ($this->model->editAuthorById($id,$author)) {
-                $this->jsonView->response("El autor fue modificado con exito.", 201);
+                $this->jsonView->response($author, 201);
             }else{
                 $this->jsonView->response("No pudo modificarse el autor", 404);
             }
