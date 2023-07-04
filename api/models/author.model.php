@@ -68,7 +68,7 @@ class AuthorModel {
     public function editAuthorById($id,$author) {      
         $query = $this->db->prepare("UPDATE autor SET id=?, nombre=?, nacionalidad=?, img_autor=?, fecha_nac=?  WHERE id=?");
         try{
-            $query->execute([$author->id,$author->name, $author->nationality, $author->img, $author->date, $id]);
+            $query->execute([$author->id,$author->nombre, $author->nacionalidad, $author->img_autor, $author->fecha_nac, $id]);
             return true;
         } catch (PDOException $e) {
             return false;

@@ -106,10 +106,10 @@ class AuthorApiController {
         if ($author) {
             //Verifica que todos los datos esten cargados, sino se les asigna el valor que ya tenia.
             $author->id = isset($data->id) ? $data->id : $author->id;
-            $author->name = isset($data->nombre) ? $data->nombre : $author->nombre;
-            $author->img = isset($data->img_autor) ? $data->img_autor : $author->img_autor;
-            $author->nationality = isset($data->nacionalidad) ? $data->nacionalidad : $author->nacionalidad;
-            $author->date = isset($data->fecha_nac) ? $data->fecha_nac : $author->fecha_nac;
+            $author->nombre = isset($data->nombre) ? $data->nombre : $author->nombre;
+            $author->img_autor = isset($data->img_autor) ? $data->img_autor : $author->img_autor;
+            $author->nacionalidad = isset($data->nacionalidad) ? $data->nacionalidad : $author->nacionalidad;
+            $author->fecha_nac = isset($data->fecha_nac) ? $data->fecha_nac : $author->fecha_nac;
             if ($this->model->editAuthorById($id,$author)) {
                 $this->jsonView->response($author, 201);
             }else{
